@@ -152,16 +152,11 @@ captured_credentials.json
 credentials_*.json
 backup_*.json
 
-# Velocity Server Runtime Files
-velocity-server/logs/
-velocity-server/plugins/*/config.yml
-velocity-server/plugins/*/data/
-velocity-server/velocity.jar
-velocity-server/forwarding.secret
+# Velocity Server (ENTIRE DIRECTORY - Auto-downloaded)
+velocity-server/
 
 # Downloaded JARs and Plugins
 *.jar
-!velocity-server/velocity.toml
 
 # Temporary Files
 *.tmp
