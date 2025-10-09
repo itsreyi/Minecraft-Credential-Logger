@@ -1,0 +1,249 @@
+# Node.js Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+
+# Electron Build Output
+dist/
+build/
+out/
+
+# Runtime Files
+*.log
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage Directory Used by Tools Like Istanbul
+coverage/
+.nyc_output
+
+# Grunt Intermediate Storage
+.grunt
+
+# Bower Dependency Directory
+bower_components
+
+# Node-waf Configuration
+.lock-wscript
+
+# Compiled Binary Addons
+build/Release
+
+# Dependency Directories
+jspm_packages/
+
+# TypeScript Cache
+*.tsbuildinfo
+
+# Optional npm Cache Directory
+.npm
+
+# Optional eslint Cache
+.eslintcache
+
+# Microbundle Cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL History
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity File
+.yarn-integrity
+
+# dotenv Environment Variables File
+.env
+.env.test
+.env.production
+
+# Parcel-bundler Cache
+.cache
+.parcel-cache
+
+# Next.js Build Output
+.next
+
+# Nuxt.js Build / Generate Output
+.nuxt
+dist
+
+# Gatsby Files
+.cache/
+public
+
+# Vuepress Build Output
+.vuepress/dist
+
+# Serverless Directories
+.serverless/
+
+# FuseBox Cache
+.fusebox/
+
+# DynamoDB Local Files
+.dynamodb/
+
+# TernJS Port File
+.tern-port
+
+# Stores VSCode Versions Used for Testing VSCode Extensions
+.vscode-test
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Icon must end with two \r
+Icon
+
+# Thumbnails
+._*
+
+# Files that might appear in the root of a volume
+.DocumentRevisions-V100
+.fseventsd
+.Spotlight-V100
+.TemporaryItems
+.Trashes
+.VolumeIcon.icns
+.com.apple.timemachine.donotpresent
+
+# Directories potentially created on remote AFP share
+.AppleDB
+.AppleDesktop
+Network Trash Folder
+Temporary Items
+.apdisk
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.cab
+*.msi
+*.msm
+*.msp
+*.lnk
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# ========================
+# MINECRAFT CLONER SPECIFIC
+# ========================
+
+# Captured Credentials (SENSITIVE DATA)
+captured_credentials.json
+*.credentials.json
+credentials_*.json
+backup_*.json
+
+# Velocity Server Runtime Files
+velocity-server/logs/
+velocity-server/plugins/*/config.yml
+velocity-server/plugins/*/data/
+velocity-server/velocity.jar
+velocity-server/forwarding.secret
+
+# Downloaded JARs and Plugins
+*.jar
+!velocity-server/velocity.toml
+
+# Temporary Files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Backup Files
+*.backup
+*.bak
+*~
+
+# Editor Files
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# OS Generated Files
+.DS_Store?
+ehthumbs.db
+Thumbs.db
+
+# Runtime Configuration
+config.json
+settings.json
+user-config.json
+
+# Development Files
+debug.log
+test-output/
+screenshots/
+
+# Ngrok Files
+ngrok
+ngrok.exe
+ngrok.yml
+.ngrok2/
+
+# Discord Webhook URLs (if stored in separate files)
+webhook-*.txt
+discord-config.txt
+
+# Test Files
+test-server/
+test-credentials/
+test-*.json
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+*.7z
+
+# Python Cache (if any Python scripts added)
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Sensitive Configuration
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Database Files
+*.db
+*.sqlite
+*.sqlite3
+
+# Certificate Files
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Local Development
+local-config.json
+dev-settings.json
+debug-config.json

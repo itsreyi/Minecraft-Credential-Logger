@@ -1,0 +1,42 @@
+# Velocity Configuration - Clonato da aleale777.aternos.me:58715
+config-version = "2.7"
+bind = "0.0.0.0:25577"
+motd = "<yellow>Proxy Server</yellow>"
+show-max-players = 20
+online-mode = false
+force-key-authentication = false
+player-info-forwarding-mode = "none"
+forwarding-secret-file = "forwarding.secret"
+announce-forge = false
+kick-existing-players = false
+ping-passthrough = "all"
+prevent-client-proxy-connections = false
+forced-hosts = {}
+
+[servers]
+	lobby = "aleale777.aternos.me:58715"
+	try = ["lobby"]
+[advanced]
+	read-timeout = 30000
+	tcp-fast-open = false
+	compression-level = -1
+	compression-threshold = 256
+	login-ratelimit = 3000
+	connection-timeout = 25000
+	log-player-connections = true
+	bungee-plugin-message-channel = true
+	show-ping-requests = false
+	#Allows players transferred from other hosts via the
+	#Transfer packet (Minecraft 1.20.5) to be received.
+	accepts-transfers = false
+	announce-proxy-commands = true
+	haproxy-protocol = false
+	log-command-executions = true
+[query]
+	port = 25577
+	show-plugins = false
+	map = "Velocity"
+	enabled = false
+[metrics]
+	id = "00000000-0000-0000-0000-000000000000"
+	enabled = false
