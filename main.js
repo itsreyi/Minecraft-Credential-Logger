@@ -176,19 +176,12 @@ class CredentialLoggerApp {
     }
 
     stopCloner() {
-        if (this.clonerProcess) {
-            this.clonerProcess.kill('SIGTERM');
-            this.clonerProcess = null;
-            
-            // It also kills Java processes
-            const killJava = spawn('taskkill', ['/f', '/im', 'java.exe'], { stdio: 'ignore' });
-            killJava.on('close', () => {
-                const killJavaw = spawn('taskkill', ['/f', '/im', 'javaw.exe'], { stdio: 'ignore' });
-            });
-
-            return { success: true, message: 'Cloner stopped' };
-        }
-        return { success: false, message: 'No active processes' };
+    if (this.clonerProcess) {
+        this.clonerProcess.kill();
+        this.clonerProcess = null;
+    }
+    this.isRunning = false;
+    return { success: true, message: 'Cloner stopped' };
     }
 
     async getCredentials() {

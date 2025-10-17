@@ -867,7 +867,7 @@ class AutoMinecraftCloner {
 
                         console.log('\n🎉 PUBLIC TUNNEL ACTIVE!');
                         console.log('═══════════════════════════════════════════════════');
-                        console.log(`📡 PUBLIC ADDRESS: ${tunnelUrl}`);
+                        console.log(`📡 PUBLIC IP: ${tunnelUrl}`);
                         console.log('🔧 SERVICE: Ngrok');
                         console.log(`🎯 CLONED TARGET: ${this.targetInfo.host}:${this.targetInfo.port}`);
                         console.log(`🎮 VERSION: ${this.targetInfo.version.name}`);
