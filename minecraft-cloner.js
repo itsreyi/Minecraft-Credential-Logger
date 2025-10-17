@@ -1,4 +1,11 @@
-#!/usr/bin/env node
+// Per killare tutti i processi figli cross-platform
+let treeKill;
+try {
+    treeKill = require('tree-kill');
+} catch (e) {
+    // tree-kill non installato, fallback a kill normale
+    treeKill = null;
+}
 
 const { spawn } = require('child_process');
 const path = require('path');
@@ -750,66 +757,121 @@ class AutoMinecraftCloner {
         // Configuration created during initial setup
 
         return new Promise((resolve, reject) => {
-            this.velocityProcess = spawn('java', [
-                '-Xms512M',
-                '-Xmx1024M',
-                '-XX:+UseG1GC',
-                '-jar',
-                'velocity.jar'
-            ], {
-                cwd: this.velocityDir,
-                stdio: ['pipe', 'pipe', 'pipe']
-            });
-
-            this.velocityProcess.stdout.on('data', (data) => {
-                const output = data.toString();
-                
-                if (output.includes('Done') || 
-                    output.includes('Listening on') || 
-                    output.includes('has connected') ||
-                    output.includes('has disconnected') ||
-                    output.includes('/login') ||
-                    output.includes('/register') ||
-                    output.includes('ERROR')) {
-                    console.log(`[VELOCITY] ${output.trim()}`);
+            // Su Windows: detached + stdio: 'ignore' + unref per evitare nuova finestra
+                if (process.platform === 'win32') {
+                    // Su Windows: niente detached, niente stdio:ignore, solo windowsHide:true
+                    this.velocityProcess = spawn('java', [
+                        '-Xms512M',
+                        '-Xmx1024M',
+                        '-XX:+UseG1GC',
+                        '-jar',
+                        'velocity.jar'
+                    ], {
+                        cwd: this.velocityDir,
+                        stdio: ['pipe', 'pipe', 'pipe'],
+                        windowsHide: true
+                    });
+                    if (this.velocityProcess.stdout) {
+                        this.velocityProcess.stdout.on('data', (data) => {
+                            const output = data.toString();
+                            if (output.includes('Done') || 
+                                output.includes('Listening on') || 
+                                output.includes('has connected') ||
+                                output.includes('has disconnected') ||
+                                output.includes('/login') ||
+                                output.includes('/register') ||
+                                output.includes('ERROR')) {
+                                console.log(`[VELOCITY] ${output.trim()}`);
+                            }
+                            if (output.includes('Done') || output.includes('Listening on')) {
+                                console.log('✅ Velocity launched successfully!');
+                                setTimeout(() => resolve(), 2000);
+                            }
+                        });
+                    }
+                    if (this.velocityProcess.stderr) {
+                        this.velocityProcess.stderr.on('data', (data) => {
+                            const error = data.toString();
+                            if (error.includes('Address already in use')) {
+                                console.log('⚠️  Port already in use, server probably already running');
+                                setTimeout(() => resolve(), 1000);
+                            } else if (error.includes('Unable to bind')) {
+                                reject(new Error('Unable to start Velocity: port occupied'));
+                            } else if (error.includes('/login') || 
+                                      error.includes('/register') ||
+                                      error.includes('authentication') ||
+                                      error.includes('password')) {
+                                console.log(`[VELOCITY AUTH] ${error.trim()}`);
+                            }
+                        });
+                    }
+                    this.velocityProcess.on('close', (code) => {
+                        if (code !== 0 && this.isRunning) {
+                            console.error(`❌ Velocity closed with code ${code}`);
+                            reject(new Error(`Velocity failed with code ${code}`));
+                        }
+                    });
+                    this.velocityProcess.on('error', (error) => {
+                        console.error('❌ Velocity error:', error.message);
+                        reject(error);
+                    });
+            } else {
+                // Su altri OS: normale, con log
+                this.velocityProcess = spawn('java', [
+                    '-Xms512M',
+                    '-Xmx1024M',
+                    '-XX:+UseG1GC',
+                    '-jar',
+                    'velocity.jar'
+                ], {
+                    cwd: this.velocityDir,
+                    stdio: ['pipe', 'pipe', 'pipe']
+                });
+                if (this.velocityProcess.stdout) {
+                    this.velocityProcess.stdout.on('data', (data) => {
+                        const output = data.toString();
+                        if (output.includes('Done') || 
+                            output.includes('Listening on') || 
+                            output.includes('has connected') ||
+                            output.includes('has disconnected') ||
+                            output.includes('/login') ||
+                            output.includes('/register') ||
+                            output.includes('ERROR')) {
+                            console.log(`[VELOCITY] ${output.trim()}`);
+                        }
+                        if (output.includes('Done') || output.includes('Listening on')) {
+                            console.log('✅ Velocity launched successfully!');
+                            setTimeout(() => resolve(), 2000);
+                        }
+                    });
                 }
-                
-                if (output.includes('Done') || output.includes('Listening on')) {
-                    console.log('✅ Velocity launched successfully!');
-
-                    // With ping-passthrough enabled, the MOTD is automatically copied
-
-                    setTimeout(() => resolve(), 2000);
+                if (this.velocityProcess.stderr) {
+                    this.velocityProcess.stderr.on('data', (data) => {
+                        const error = data.toString();
+                        if (error.includes('Address already in use')) {
+                            console.log('⚠️  Port already in use, server probably already running');
+                            setTimeout(() => resolve(), 1000);
+                        } else if (error.includes('Unable to bind')) {
+                            reject(new Error('Unable to start Velocity: port occupied'));
+                        } else if (error.includes('/login') || 
+                                  error.includes('/register') ||
+                                  error.includes('authentication') ||
+                                  error.includes('password')) {
+                            console.log(`[VELOCITY AUTH] ${error.trim()}`);
+                        }
+                    });
                 }
-            });
-
-            this.velocityProcess.stderr.on('data', (data) => {
-                const error = data.toString();
-                
-                if (error.includes('Address already in use')) {
-                    console.log('⚠️  Port already in use, server probably already running');
-                    setTimeout(() => resolve(), 1000);
-                } else if (error.includes('Unable to bind')) {
-                    reject(new Error('Unable to start Velocity: port occupied'));
-                } else if (error.includes('/login') || 
-                          error.includes('/register') ||
-                          error.includes('authentication') ||
-                          error.includes('password')) {
-                    console.log(`[VELOCITY AUTH] ${error.trim()}`);
-                }
-            });
-
-            this.velocityProcess.on('close', (code) => {
-                if (code !== 0 && this.isRunning) {
-                    console.error(`❌ Velocity closed with code ${code}`);
-                    reject(new Error(`Velocity failed with code ${code}`));
-                }
-            });
-
-            this.velocityProcess.on('error', (error) => {
-                console.error('❌ Velocity error:', error.message);
-                reject(error);
-            });
+                this.velocityProcess.on('close', (code) => {
+                    if (code !== 0 && this.isRunning) {
+                        console.error(`❌ Velocity closed with code ${code}`);
+                        reject(new Error(`Velocity failed with code ${code}`));
+                    }
+                });
+                this.velocityProcess.on('error', (error) => {
+                    console.error('❌ Velocity error:', error.message);
+                    reject(error);
+                });
+            }
         });
     }
 
@@ -1131,17 +1193,42 @@ class AutoMinecraftCloner {
 
     cleanup() {
         console.log('🧹 Cleaning up processes...');
-        
+
+
+        // Kill entire process group for Velocity on Windows
         if (this.velocityProcess) {
-            this.velocityProcess.kill();
-            console.log('🛑 Velocity stopped');
+            try {
+                if (this.velocityProcess.pid && this.velocityProcess.pid > 0) {
+                    if (treeKill) {
+                        treeKill(this.velocityProcess.pid, 'SIGKILL', (err) => {
+                            if (err && err.code !== 'ESRCH') {
+                                console.log('⚠️  Error killing Velocity (tree-kill):', err.message);
+                            } else {
+                                console.log('🛑 Velocity stopped (tree-kill)');
+                            }
+                        });
+                    } else {
+                        // Fallback: kill solo il processo padre
+                        this.velocityProcess.kill('SIGKILL');
+                        console.log('🛑 Velocity stopped (fallback)');
+                    }
+                }
+            } catch (e) {
+                if (e.code !== 'ESRCH') {
+                    console.log('⚠️  Error killing Velocity:', e.message);
+                }
+            }
         }
-        
+
         if (this.tunnelProcess) {
-            this.tunnelProcess.kill();
-            console.log('🛑 Tunnel stopped');
+            try {
+                this.tunnelProcess.kill(killSignal);
+                console.log('🛑 Tunnel stopped');
+            } catch (e) {
+                console.log('⚠️  Error killing Tunnel:', e.message);
+            }
         }
-        
+
         this.isRunning = false;
     }
 
@@ -1164,15 +1251,29 @@ class AutoMinecraftCloner {
 }
 
 // Automatic startup
+
 if (require.main === module) {
     if (process.argv.length < 3) {
         console.log('❌ Usage: node minecraft-cloner.js <server> [port]');
         console.log('📝 Example: node minecraft-cloner.js myserver.net 25565');
         process.exit(1);
     }
-    
-    const cloner = new AutoMinecraftCloner();
-    cloner.run().catch(console.error);
+
+    // Assign the cloner instance to globalThis for signal handling
+    globalThis.clonerInstance = new AutoMinecraftCloner();
+    globalThis.clonerInstance.run().catch(console.error);
+
+    // Handle termination signals for proper cleanup
+    const cleanupAndExit = (signal) => {
+        if (globalThis.clonerInstance) {
+            console.log(`\n⏹️  Received ${signal}, cleaning up...`);
+            globalThis.clonerInstance.credLogger.printStats();
+            globalThis.clonerInstance.cleanup();
+        }
+        process.exit(0);
+    };
+    process.on('SIGTERM', () => cleanupAndExit('SIGTERM'));
+    process.on('SIGINT', () => cleanupAndExit('SIGINT'));
 }
 
 module.exports = AutoMinecraftCloner;

